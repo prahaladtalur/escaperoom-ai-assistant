@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EscapeRoom Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .input-section {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        #queryInput {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: 1px solid #333;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .btn:hover {
+            background: #eee;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .voice-controls {
+            text-align: center;
+        }
+        
+        .results {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            display: none;
+        }
+        
+        .puzzle-info h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .puzzle-description {
+            background: #eee;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-style: italic;
+            border-left: 3px solid #333;
+        }
+        
+        .hints {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .hints li {
+            background: white;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-left: 3px solid #666;
+        }
+        
+        .error {
+            background: #ffe6e6;
+            border: 1px solid #ff9999;
+            color: #cc0000;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .voice-status {
+            text-align: center;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .listening {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>EscapeRoom Assistant</h1>
+            <p>Puzzle solving helper</p>
+        </div>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="queryInput" placeholder="Describe your puzzle problem (e.g. stuck on mushroom puzzle in room 2)" />
+                <button class="btn" onclick="submitQuery()">Get Hints</button>
+            </div>
+            
+            <div class="voice-controls">
+                <button class="btn" id="voiceBtn" onclick="toggleVoice()">Start Voice</button>
+                <button class="btn" onclick="clearResults()">Clear</button>
+            </div>
+            
+            <div class="voice-status" id="voiceStatus"></div>
+        </div>
+        
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        let recognition;
+        let isListening = false;
+        
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+            
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById('voiceStatus').innerHTML = '<span class="listening">Listening...</span>';
+                document.getElementById('voiceBtn').textContent = 'Stop';
+            };
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('queryInput').value = transcript;
+                document.getElementById('voiceStatus').textContent = 'Heard: "' + transcript + '"';
+                submitQuery();
+            };
+            
+            recognition.onend = function() {
+                isListening = false;
+                document.getElementById('voiceBtn').textContent = 'Start Voice';
+                if (document.getElementById('voiceStatus').textContent.includes('Listening')) {
+                    document.getElementById('voiceStatus').textContent = '';
+                }
+            };
+            
+            recognition.onerror = function(event) {
+                document.getElementById('voiceStatus').innerHTML = '<span class="error">Voice recognition error</span>';
+                isListening = false;
+                document.getElementById('voiceBtn').textContent = 'Start Voice';
+            };
+        }
+        
+        function toggleVoice() {
+            if (!recognition) {
+                alert('Voice recognition not supported in this browser');
+                return;
+            }
+            
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+        
+        function submitQuery() {
+            const query = document.getElementById('queryInput').value.trim();
+            if (!query) return;
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="loading"><p>Finding your puzzle...</p></div>';
+            
+            fetch('/api/query', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: query })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    resultsDiv.innerHTML = '<div class="error">' + data.error + '</div>';
+                } else {
+                    displayResults(data);
+                }
+            })
+            .catch(error => {
+                resultsDiv.innerHTML = '<div class="error">Connection error: ' + error.message + '</div>';
+            });
+        }
+        
+        function displayResults(data) {
+            const hintsHtml = data.hints.map((hint, index) => 
+                '<li><strong>Hint ' + (index + 1) + ':</strong> ' + hint + '</li>'
+            ).join('');
+            
+            document.getElementById('results').innerHTML = 
+                '<div class="puzzle-info">' +
+                '<h2>' + data.puzzle_name + '</h2>' +
+                '<p><strong>Location:</strong> ' + data.room + '</p>' +
+                (data.description ? '<div class="puzzle-description">' + data.description + '</div>' : '') +
+                '<h3>Hints:</h3>' +
+                '<ul class="hints">' + hintsHtml + '</ul>' +
+                '</div>';
+        }
+        
+        function clearResults() {
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('queryInput').value = '';
+            document.getElementById('voiceStatus').textContent = '';
+        }
+        
+        document.getElementById('queryInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitQuery();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+ * Serving Flask app 'web_app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.1.43:5001
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 123-716-044
+127.0.0.1 - - [28/Aug/2025 20:43:42] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [28/Aug/2025 20:43:54] "POST /api/query HTTP/1.1" 200 -
+127.0.0.1 - - [28/Aug/2025 20:44:04] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [28/Aug/2025 20:44:09] "POST /api/query HTTP/1.1" 200 -
+127.0.0.1 - - [28/Aug/2025 20:46:29] "GET / HTTP/1.1" 200 -
+ * Detected change in '/Users/prahaladtalur/Documents/puzzles/web_app.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 123-716-044
+ * Detected change in '/Users/prahaladtalur/Documents/puzzles/escape_ai.py', reloading
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 123-716-044
+127.0.0.1 - - [28/Aug/2025 20:57:07] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [28/Aug/2025 20:57:07] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+127.0.0.1 - - [28/Aug/2025 20:58:01] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [28/Aug/2025 20:58:30] "POST /api/query HTTP/1.1" 200 -
+127.0.0.1 - - [28/Aug/2025 21:07:32] "POST /api/query HTTP/1.1" 200 -
+127.0.0.1 - - [28/Aug/2025 21:07:54] "POST /api/query HTTP/1.1" 200 -
+127.0.0.1 - - [30/Aug/2025 18:30:42] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [30/Aug/2025 18:30:48] "POST /api/query HTTP/1.1" 200 -
+/opt/homebrew/Cellar/python@3.13/3.13.6/Frameworks/Python.framework/Versions/3.13/lib/python3.13/multiprocessing/resource_tracker.py:301: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-mfxofif_'}
+  warnings.warn(
+/opt/homebrew/Cellar/python@3.13/3.13.6/Frameworks/Python.framework/Versions/3.13/lib/python3.13/multiprocessing/resource_tracker.py:317: UserWarning: resource_tracker: '/mp-mfxofif_': [Errno 2] No such file or directory
+  warnings.warn('resource_tracker: %r: %s' % (name, e))
